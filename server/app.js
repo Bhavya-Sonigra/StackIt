@@ -10,6 +10,7 @@ import questionRoutes from './routes/questions.js';
 import answerRoutes from './routes/answers.js';
 import notificationRoutes from './routes/notifications.js';
 import adminRoutes from './routes/admin.js';
+import userRoutes from './routes/users.js';
 
 const app = express();
 
@@ -35,5 +36,6 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/answers', answerRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 export default app;

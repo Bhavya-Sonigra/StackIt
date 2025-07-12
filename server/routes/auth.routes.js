@@ -15,6 +15,62 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 /* ---------------------------------------------
+   Get Current User
+--------------------------------------------- */
+router.get('/me', async (req, res) => {
+  try {
+    let token = null;
+
+    // 🔷 1. Try access token from header
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+
+    // 🔷 2. If not, try refresh token from cookie
+    if (!token && req.cookies.jid) {
+      token = req.cookies.jid;
+    }
+
+    if (!token) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    let payload;
+    try {
+      // 🔷 3. First try to verify as access token
+      payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    } catch (err) {
+      console.log('Access token failed, trying refresh...');
+      // 🔷 4. If that fails, try refresh token
+      try {
+        payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+
+        // Make sure refresh token is current in DB
+        const userWithToken = await User.findById(payload.id);
+        if (!userWithToken || userWithToken.refreshToken !== token) {
+          return res.status(401).json({ message: 'Session invalid. Please log in again.' });
+        }
+      } catch (err2) {
+        return res.status(401).json({ message: 'Invalid or expired token' });
+      }
+    }
+
+    // 🔷 5. Find user
+    const user = await User.findById(payload.id).select('-password -refreshToken');
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    res.json({ user });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ message: 'Authentication failed' });
+  }
+});
+
+
+/* ---------------------------------------------
    Refresh Token
 --------------------------------------------- */
 router.post('/refresh', async (req, res) => {
@@ -45,13 +101,27 @@ router.post('/refresh', async (req, res) => {
 --------------------------------------------- */
 router.post('/logout', async (req, res) => {
   try {
-    await User.updateOne({ refreshToken: req.cookies.jid }, { $unset: { refreshToken: 1 } });
-    res.clearCookie('jid');
+    const token = req.cookies.jid;
+
+    if (token) {
+      // clear refreshToken from DB if it matches cookie
+      await User.updateOne({ refreshToken: token }, { $unset: { refreshToken: 1 } });
+    }
+
+    res.clearCookie('jid', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/', // ensure matches login
+    });
+
     res.status(204).end();
-  } catch {
+  } catch (err) {
+    console.error('Logout error', err);
     res.status(500).json({ message: 'Logout error' });
   }
 });
+
 
 /* ---------------------------------------------
    Google OAuth Flow
@@ -84,7 +154,8 @@ router.get('/google/callback',
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
       });
 
-      res.redirect('http://localhost:3000/dashboard'); // NO token in URL
+      // Redirect with a success flag so the client knows to check auth
+      res.redirect('http://localhost:3000?auth=success');
     } catch (err) {
       console.error('Google callback error:', err);
       res.redirect('/api/auth/failure');

@@ -18,6 +18,19 @@ router.post('/', auth, async (req, res) => {
     await answer.save();
     // Add answer to question's answers array
     await Question.findByIdAndUpdate(questionId, { $push: { answers: answer._id } });
+    
+    // Create notification for question owner
+    const question = await Question.findById(questionId);
+    if (question && question.authorId.toString() !== userId.toString()) {
+      const Notification = (await import('../models/Notification.js')).default;
+      const notification = new Notification({
+        userId: question.authorId,
+        type: 'answer',
+        message: `${req.user.name || req.user.username} answered your question "${question.title}"`
+      });
+      await notification.save();
+    }
+    
     res.status(201).json(answer);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -27,7 +40,9 @@ router.post('/', auth, async (req, res) => {
 // Get all answers for a question
 router.get('/question/:questionId', async (req, res) => {
   try {
-    const answers = await Answer.find({ questionId: req.params.questionId }).sort({ createdAt: -1 });
+    const answers = await Answer.find({ questionId: req.params.questionId })
+      .populate('authorId', 'name username')
+      .sort({ createdAt: -1 });
     res.json(answers);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -82,9 +97,54 @@ router.delete('/:id', auth, async (req, res) => {
 // Upvote an answer
 router.post('/:id/upvote', auth, async (req, res) => {
   try {
-    const answer = await Answer.findByIdAndUpdate(req.params.id, { $inc: { votes: 1 } }, { new: true });
+    const Vote = (await import('../models/Vote.js')).default;
+    const answerId = req.params.id;
+    const userId = req.user._id;
+    
+    // Check if answer exists
+    const answer = await Answer.findById(answerId);
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
-    res.json(answer);
+    
+    // Check if user has already voted
+    const existingVote = await Vote.findOne({ 
+      userId, 
+      targetId: answerId, 
+      targetType: 'answer' 
+    });
+    
+    if (existingVote) {
+      if (existingVote.voteType === 'upvote') {
+        return res.status(400).json({ error: 'You have already upvoted this answer' });
+      } else {
+        // Change downvote to upvote
+        existingVote.voteType = 'upvote';
+        await existingVote.save();
+        await Answer.findByIdAndUpdate(answerId, { $inc: { votes: 2 } }); // +2 because removing downvote and adding upvote
+      }
+    } else {
+      // Create new upvote
+      await Vote.create({
+        userId,
+        targetId: answerId,
+        targetType: 'answer',
+        voteType: 'upvote'
+      });
+      await Answer.findByIdAndUpdate(answerId, { $inc: { votes: 1 } });
+    }
+    
+    // Create notification for answer author
+    if (answer.authorId.toString() !== userId.toString()) {
+      const Notification = (await import('../models/Notification.js')).default;
+      const notification = new Notification({
+        userId: answer.authorId,
+        type: 'vote',
+        message: `${req.user.name || req.user.username} upvoted your answer`
+      });
+      await notification.save();
+    }
+    
+    const updatedAnswer = await Answer.findById(answerId);
+    res.json(updatedAnswer);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -93,9 +153,54 @@ router.post('/:id/upvote', auth, async (req, res) => {
 // Downvote an answer
 router.post('/:id/downvote', auth, async (req, res) => {
   try {
-    const answer = await Answer.findByIdAndUpdate(req.params.id, { $inc: { votes: -1 } }, { new: true });
+    const Vote = (await import('../models/Vote.js')).default;
+    const answerId = req.params.id;
+    const userId = req.user._id;
+    
+    // Check if answer exists
+    const answer = await Answer.findById(answerId);
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
-    res.json(answer);
+    
+    // Check if user has already voted
+    const existingVote = await Vote.findOne({ 
+      userId, 
+      targetId: answerId, 
+      targetType: 'answer' 
+    });
+    
+    if (existingVote) {
+      if (existingVote.voteType === 'downvote') {
+        return res.status(400).json({ error: 'You have already downvoted this answer' });
+      } else {
+        // Change upvote to downvote
+        existingVote.voteType = 'downvote';
+        await existingVote.save();
+        await Answer.findByIdAndUpdate(answerId, { $inc: { votes: -2 } }); // -2 because removing upvote and adding downvote
+      }
+    } else {
+      // Create new downvote
+      await Vote.create({
+        userId,
+        targetId: answerId,
+        targetType: 'answer',
+        voteType: 'downvote'
+      });
+      await Answer.findByIdAndUpdate(answerId, { $inc: { votes: -1 } });
+    }
+    
+    // Create notification for answer author
+    if (answer.authorId.toString() !== userId.toString()) {
+      const Notification = (await import('../models/Notification.js')).default;
+      const notification = new Notification({
+        userId: answer.authorId,
+        type: 'vote',
+        message: `${req.user.name || req.user.username} downvoted your answer`
+      });
+      await notification.save();
+    }
+    
+    const updatedAnswer = await Answer.findById(answerId);
+    res.json(updatedAnswer);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

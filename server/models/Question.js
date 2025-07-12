@@ -9,7 +9,9 @@ const QuestionSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   answers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Answer' }],
   acceptedAnswer: { type: mongoose.Schema.Types.ObjectId, ref: 'Answer' },
-  votes: { type: Number, default: 0 }
+  votes: { type: Number, default: 0 },
+  flaggedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  views: { type: Number, default: 0 }
 });
 
 const Question = mongoose.model('Question', QuestionSchema);

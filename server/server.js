@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 // Force dotenv to load
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-console.log('MONGO_URI from .env:', process.env.MONGO_URI); // keep this debug
+// Environment variables loaded
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
