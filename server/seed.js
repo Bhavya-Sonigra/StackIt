@@ -10,7 +10,7 @@ const seedTempUser = async () => {
 
   const hashed = await bcrypt.hash('temp123', 10);
   const user = await User.create({
-    name: 'Temp User',
+    name: '',
     email: 'temp@green.com',
     password: hashed
   });
