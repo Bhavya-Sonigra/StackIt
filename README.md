@@ -47,18 +47,6 @@
 
 ---
 
-## 📸 Screenshots
-
-> Include images of the following:
->
-> * Landing Page
-> * Ask Question Form
-> * Answer Page
-> * Admin Dashboard
-> * Notifications Dropdown
-
----
-
 ## 🛠 Installation & Setup
 
 ### 1. Clone the Repository
