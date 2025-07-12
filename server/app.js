@@ -6,6 +6,10 @@ import passport from 'passport';
 import './config/passport.js'; 
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
+import questionRoutes from './routes/questions.js';
+import answerRoutes from './routes/answers.js';
+import notificationRoutes from './routes/notifications.js';
+import adminRoutes from './routes/admin.js';
 
 const app = express();
 
@@ -25,6 +29,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/questions', questionRoutes);
+app.use('/api/answers', answerRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 export default app;

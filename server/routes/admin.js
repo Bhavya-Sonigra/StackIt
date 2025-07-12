@@ -1,14 +1,16 @@
-const express = require('express');
+import express from 'express';
+import User from '../models/User.js';
+import Question from '../models/Question.js';
+import Answer from '../models/Answer.js';
+import auth from '../middleware/auth.js';
+import admin from '../middleware/admin.js';
+
 const router = express.Router();
-const User = require('../models/User');
-const Question = require('../models/Question');
-const Answer = require('../models/Answer');
-// const auth = require('../middleware/auth'); // Uncomment if you have auth middleware
 
 // Get all users
-router.get('/users', /*auth,*/ async (req, res) => {
+router.get('/users', auth, admin, async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password -refreshToken');
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -16,7 +18,7 @@ router.get('/users', /*auth,*/ async (req, res) => {
 });
 
 // Ban a user
-router.put('/users/:id/ban', /*auth,*/ async (req, res) => {
+router.put('/users/:id/ban', auth, admin, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, { banned: true }, { new: true });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -27,7 +29,7 @@ router.put('/users/:id/ban', /*auth,*/ async (req, res) => {
 });
 
 // Unban a user
-router.put('/users/:id/unban', /*auth,*/ async (req, res) => {
+router.put('/users/:id/unban', auth, admin, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, { banned: false }, { new: true });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -38,7 +40,7 @@ router.put('/users/:id/unban', /*auth,*/ async (req, res) => {
 });
 
 // Delete a question
-router.delete('/questions/:id', /*auth,*/ async (req, res) => {
+router.delete('/questions/:id', auth, admin, async (req, res) => {
   try {
     const question = await Question.findByIdAndDelete(req.params.id);
     if (!question) return res.status(404).json({ error: 'Question not found' });
@@ -49,7 +51,7 @@ router.delete('/questions/:id', /*auth,*/ async (req, res) => {
 });
 
 // Delete an answer
-router.delete('/answers/:id', /*auth,*/ async (req, res) => {
+router.delete('/answers/:id', auth, admin, async (req, res) => {
   try {
     const answer = await Answer.findByIdAndDelete(req.params.id);
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
@@ -59,4 +61,4 @@ router.delete('/answers/:id', /*auth,*/ async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

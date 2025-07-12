@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const AnswerSchema = new mongoose.Schema({
   questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -7,4 +8,6 @@ const AnswerSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   votes: { type: Number, default: 0 }
 });
-module.exports = mongoose.model('Answer', AnswerSchema);
+
+const Answer = mongoose.model('Answer', AnswerSchema);
+export default Answer;

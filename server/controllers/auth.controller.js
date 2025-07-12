@@ -1,7 +1,7 @@
 // controllers/auth.controller.js
-import User from '../models/User.model.js';
+import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
-import { signAccess, signRefresh } from '../utils/tokens.js';
+import { signAccess, signRefresh } from '../utils/token.js';
 
 /* ------------------------------------------------------------------ */
 /*  Register                                                          */

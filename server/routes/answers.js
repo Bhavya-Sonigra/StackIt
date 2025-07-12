@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
+import Answer from '../models/Answer.js';
+import Question from '../models/Question.js';
+import auth from '../middleware/auth.js';
+
 const router = express.Router();
-const Answer = require('../models/Answer');
-const Question = require('../models/Question');
-// const auth = require('../middleware/auth'); // Uncomment if you have auth middleware
 
 // Create an answer
-router.post('/', /*auth,*/ async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const { questionId, description } = req.body;
-    // const userId = req.user.id; // Use with auth middleware
-    const userId = req.body.authorId; // TEMP: Remove when using auth
+    const userId = req.user._id;
     const answer = new Answer({
       questionId,
       authorId: userId,
@@ -35,26 +35,42 @@ router.get('/question/:questionId', async (req, res) => {
 });
 
 // Update an answer
-router.put('/:id', /*auth,*/ async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const { description } = req.body;
-    const answer = await Answer.findByIdAndUpdate(
+    const answer = await Answer.findById(req.params.id);
+    
+    if (!answer) return res.status(404).json({ error: 'Answer not found' });
+    
+    // Only the author can update the answer
+    if (answer.authorId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Not authorized to update this answer' });
+    }
+    
+    const updatedAnswer = await Answer.findByIdAndUpdate(
       req.params.id,
       { description, updatedAt: Date.now() },
       { new: true }
     );
-    if (!answer) return res.status(404).json({ error: 'Answer not found' });
-    res.json(answer);
+    res.json(updatedAnswer);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // Delete an answer
-router.delete('/:id', /*auth,*/ async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
-    const answer = await Answer.findByIdAndDelete(req.params.id);
+    const answer = await Answer.findById(req.params.id);
+    
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
+    
+    // Only the author or admin can delete the answer
+    if (answer.authorId.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to delete this answer' });
+    }
+    
+    await Answer.findByIdAndDelete(req.params.id);
     // Remove answer from question's answers array
     await Question.findByIdAndUpdate(answer.questionId, { $pull: { answers: answer._id } });
     res.json({ message: 'Answer deleted' });
@@ -64,7 +80,7 @@ router.delete('/:id', /*auth,*/ async (req, res) => {
 });
 
 // Upvote an answer
-router.post('/:id/upvote', /*auth,*/ async (req, res) => {
+router.post('/:id/upvote', auth, async (req, res) => {
   try {
     const answer = await Answer.findByIdAndUpdate(req.params.id, { $inc: { votes: 1 } }, { new: true });
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
@@ -75,7 +91,7 @@ router.post('/:id/upvote', /*auth,*/ async (req, res) => {
 });
 
 // Downvote an answer
-router.post('/:id/downvote', /*auth,*/ async (req, res) => {
+router.post('/:id/downvote', auth, async (req, res) => {
   try {
     const answer = await Answer.findByIdAndUpdate(req.params.id, { $inc: { votes: -1 } }, { new: true });
     if (!answer) return res.status(404).json({ error: 'Answer not found' });
@@ -85,4 +101,4 @@ router.post('/:id/downvote', /*auth,*/ async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

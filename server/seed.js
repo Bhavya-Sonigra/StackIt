@@ -3,20 +3,40 @@ dotenv.config();
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import User from './models/User.model.js';
+import User from './models/User.js';
 
 const seedTempUser = async () => {
-  await mongoose.connect(process.env.MONGO_URI, { dbName: 'auth-db' });
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
 
-  const hashed = await bcrypt.hash('temp123', 10);
-  const user = await User.create({
-    name: '',
-    email: 'temp@green.com',
-    password: hashed
-  });
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ email: 'admin@stackit.com' });
+    if (existingAdmin) {
+      console.log('✅ Admin user already exists:', existingAdmin.email);
+      process.exit(0);
+    }
 
-  console.log('✅ Temp user created:', user);
-  process.exit();
+    const hashed = await bcrypt.hash('admin123', 10);
+    const user = await User.create({
+      username: 'admin', // Add username for local user
+      name: 'Admin User', // Add proper name
+      email: 'admin@stackit.com',
+      password: hashed,
+      isAdmin: true, // Set admin flag
+      banned: false
+    });
+
+    console.log('✅ Admin user created successfully:');
+    console.log('Email:', user.email);
+    console.log('Username:', user.username);
+    console.log('Is Admin:', user.isAdmin);
+    console.log('Password: admin123');
+    
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Error creating admin user:', error.message);
+    process.exit(1);
+  }
 };
 
 seedTempUser();

@@ -3,8 +3,8 @@ import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { registerUser, loginUser } from '../controllers/auth.controller.js';
-import { signAccess, signRefresh } from '../utils/tokens.js';
-import User from '../models/User.model.js';
+import { signAccess, signRefresh } from '../utils/token.js';
+import User from '../models/User.js';
 
 const router = express.Router();
 

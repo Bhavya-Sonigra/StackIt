@@ -1,10 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
+  username: { type: String, unique: true, sparse: true }, // for local users
+  name: { type: String }, // for Google users
   email: { type: String, required: true, unique: true },
-  passwordHash: { type: String, required: true },
+  password: { type: String }, // for local users (hashed)
+  googleId: { type: String }, // for Google users
+  refreshToken: { type: String }, // for JWT refresh
   isAdmin: { type: Boolean, default: false },
   banned: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
-module.exports = mongoose.model('User', UserSchema);
+
+const User = mongoose.model('User', UserSchema);
+export default User;
