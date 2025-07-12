@@ -140,7 +140,7 @@ export default function AskQuestion() {
                             required
                             value={formData.title}
                             onChange={handleTitleChange}
-                            className="block w-full px-4 py-2 border border-purple-200 rounded-lg placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 bg-purple-50"
+                            className="block w-full px-4 py-2 border border-purple-200 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 bg-white text-gray-900"
                             placeholder="Enter your question title"
                         />
                     </div>
@@ -167,7 +167,7 @@ export default function AskQuestion() {
                             value={tagInput}
                             onChange={handleTagInputChange}
                             onKeyDown={handleTagInputKeyDown}
-                            className="block w-full px-4 py-2 border border-purple-200 rounded-lg placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 bg-purple-50"
+                            className="block w-full px-4 py-2 border border-purple-200 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 bg-white text-gray-900"
                             placeholder="Add tags (press Enter or comma)"
                         />
                     </div>

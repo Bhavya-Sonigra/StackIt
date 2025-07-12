@@ -309,7 +309,7 @@ export default function AdminDashboard() {
                                         value={notificationMessage}
                                         onChange={(e) => setNotificationMessage(e.target.value)}
                                         placeholder="Enter your message for all users..."
-                                        className="w-full px-4 py-2 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 bg-white"
+                                        className="w-full px-4 py-2 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 bg-white text-gray-900 placeholder-gray-500"
                                         rows="3"
                                         required
                                     />
@@ -342,9 +342,9 @@ export default function AdminDashboard() {
                                 <tbody>
                                     {users.map(user => (
                                         <tr key={user._id} className="border-b">
-                                            <td className="px-4 py-2">{user.name || user.username || 'N/A'}</td>
-                                            <td className="px-4 py-2">{user.email}</td>
-                                            <td className="px-4 py-2">{user.isAdmin ? 'Admin' : 'User'}</td>
+                                            <td className="px-4 py-2 text-gray-900">{user.name || user.username || 'N/A'}</td>
+                                            <td className="px-4 py-2 text-gray-900">{user.email}</td>
+                                            <td className="px-4 py-2 text-gray-900">{user.isAdmin ? 'Admin' : 'User'}</td>
                                             <td className="px-4 py-2">
                                                 <button 
                                                     onClick={() => handleBanUser(user._id, !user.banned)}
