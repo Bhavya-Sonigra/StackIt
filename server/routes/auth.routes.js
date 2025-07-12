@@ -1,9 +1,12 @@
 import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import { signAccess, signRefresh } from '../utils/tokens.js';
+import jwt from 'jsonwebtoken';
 import { registerUser, loginUser } from '../controllers/auth.controller.js';
 
 const router = express.Router();
+
 router.post('/login', loginUser);
 
 // Google OAuth - Start login flow
