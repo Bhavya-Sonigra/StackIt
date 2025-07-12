@@ -3,10 +3,11 @@
 - **Email**: [dolarjay3457@gmail.com](mailto:dolarjay3457@gmail.com)
 - **Phone**: 7622095910
 - **Video Demo Link**: [Project Demo](https://drive.google.com/drive/folders/1GHpGb3xBaGjGJVrqT3aUhQZJYpHmLENV?usp=sharing)
+- **Problem statement - 2**: StackIt – A Minimal Q&A Forum Platform
 
 ---
 
-# 🧠 StackIt – Minimal Q\&A Forum Platform
+#Problem statement - 2: 🧠 StackIt – Minimal Q\&A Forum Platform
 
 **StackIt** is a minimal StackOverflow-style Q\&A platform designed for community-driven knowledge sharing. Built during an 8-hour hackathon, it enables users to ask and answer questions, vote on content, receive notifications, and moderate discussions based on their roles.
 
