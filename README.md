@@ -1,8 +1,8 @@
-**Team Leader Name**: Jay Dolar
-**Team Name**: Dev Conquer (Team 2073)
-**Email**: [dolarjay3457@gmail.com](mailto:dolarjay3457@gmail.com)
-**Phone**: 7622095910
-**Video Demo Link**: [Project Demo](https://drive.google.com/drive/folders/1GHpGb3xBaGjGJVrqT3aUhQZJYpHmLENV?usp=sharing)
+- **Team Leader Name**: Jay Dolar
+- **Team Name**: Dev Conquer (Team 2073)
+- **Email**: [dolarjay3457@gmail.com](mailto:dolarjay3457@gmail.com)
+- **Phone**: 7622095910
+- **Video Demo Link**: [Project Demo](https://drive.google.com/drive/folders/1GHpGb3xBaGjGJVrqT3aUhQZJYpHmLENV?usp=sharing)
 
 ---
 
