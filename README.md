@@ -3,6 +3,7 @@
 - **Email**: [dolarjay3457@gmail.com](mailto:dolarjay3457@gmail.com)
 - **Phone**: 7622095910
 - **Video Demo Link**: [Project Demo](https://drive.google.com/drive/folders/1GHpGb3xBaGjGJVrqT3aUhQZJYpHmLENV?usp=sharing)
+- **YouTube Video Demo Link**: [Project Demo](https://youtu.be/RnqQQz7nPiY)
 - **Problem statement - 2**: StackIt – A Minimal Q&A Forum Platform
 
 ---
